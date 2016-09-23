@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zuihuibao.dcs.mapper.UserActionLogMapper">
+  <insert id="batchInsert" parameterType="java.util.List">
+    insert into user_action_log
+    (
+      user_id,
+      event_code,
+      event_id,
+      relate_user_id,
+      channel_id,
+      ep1,
+      ep2
+    )
+    values
+    <foreach collection="list" item="item" index="index"
+        separator=",">
+      (
+      #{item.userId},
+      #{item.eventCode},
+      #{item.eventId},
+      #{item.relateUserId},
+      #{item.channelId},
+      #{item.ep1},
+      #{item.ep2}
+      )
+    </foreach>
+  </insert>
+</mapper>

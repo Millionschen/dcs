@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+  <Properties>
+    <Property name="filename">$${sys:logFile}</Property>
+  </Properties>
+
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout
+          pattern="[%date{yyyy-MM-dd HH:mm:ss.SSS}][%thread][%level][%class][%line]:%message%n"/>
+    </Console>
+
+    <RollingRandomAccessFile name="infoLog" fileName="${log4j.dir}/${filename}.log"
+        filePattern="@log4j.dir@/${filename}.%d{yyyy-MM-dd}.log.gz" append="true">
+      <PatternLayout
+          pattern="[%date{yyyy-MM-dd HH:mm:ss.SSS}][%thread][%level][%class][%line]:%message%n"/>
+      <Filters>
+        <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="NEUTRAL"/>
+      </Filters>
+      <Policies>
+        <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+      </Policies>
+    </RollingRandomAccessFile>
+
+    <RollingRandomAccessFile name="warnLog" fileName="${log4j.dir}/warn-${filename}.log"
+        filePattern="@log4j.dir@/warn-${filename}.%d{yyyy-MM-dd}.log.gz" append="true">
+      <Filters>
+        <ThresholdFilter level="error" onMatch="DENY" onMismatch="NEUTRAL"/>
+        <ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="DENY"/>
+      </Filters>
+      <PatternLayout
+          pattern="[%date{yyyy-MM-dd HH:mm:ss.SSS}][%thread][%level][%class][%line]:%message%n"/>
+      <Policies>
+        <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+      </Policies>
+    </RollingRandomAccessFile>
+
+    <RollingRandomAccessFile name="errorLog" fileName="${log4j.dir}/error-${filename}.log"
+        filePattern="@log4j.dir@/error-${filename}.%d{yyyy-MM-dd}.log.gz" append="true">
+      <Filters>
+        <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+      </Filters>
+      <PatternLayout
+          pattern="[%date{yyyy-MM-dd HH:mm:ss.SSS}][%thread][%level][%class][%line]:%message%n"/>
+      <Policies>
+        <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+      </Policies>
+    </RollingRandomAccessFile>
+
+  </Appenders>
+
+  <Loggers>
+    <!-- 第三方的软件日志级别 -->
+    <logger name="org.springframework" level="info" additivity="true">
+      <AppenderRef ref="warnLog"/>
+      <AppenderRef ref="errorLog"/>
+    </logger>
+
+    <logger name="java.sql.PreparedStatement" level="debug" additivity="true">
+      <AppenderRef ref="Console"/>
+    </logger>
+
+    <logger name="com.zuihuibao.dcs.mapper" level="debug" additivity="false">
+      <AppenderRef ref="Console"/>
+    </logger>
+
+    <!-- 剩余其他的日志级别 -->
+    <Root level="info" includeLocation="true">
+      <AppenderRef ref="infoLog"/>
+      <AppenderRef ref="Console"/>
+    </Root>
+  </Loggers>
+
+</Configuration>

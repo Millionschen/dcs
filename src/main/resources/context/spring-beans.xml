@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+  <import resource="classpath*:mybatis/mybatis-spring.xml"/>
+
+  <context:component-scan base-package="com.zuihuibao.dcs.logger"/>
+
+  <context:annotation-config/>
+
+  <util:properties id="kafkaProps">
+    <prop key="bootstrap.servers">${bootstrap.servers}</prop>
+    <prop key="group.id">${group.id}</prop>
+    <prop key="enable.auto.commit">${enable.auto.commit}</prop>
+    <prop key="auto.commit.interval.ms">${auto.commit.interval.ms}</prop>
+    <prop key="session.timeout.ms">${session.timeout.ms}</prop>
+    <prop key="key.deserializer">${key.deserializer}</prop>
+    <prop key="value.deserializer">${value.deserializer}</prop>
+  </util:properties>
+
+  <bean id="receiver" class="com.zuihuibao.dcs.receiver.MessageReceiverImpl">
+    <constructor-arg ref="kafkaProps" index="0"/>
+    <constructor-arg value="${period}" index="1"/>
+    <constructor-arg value="${pollTime}" index="2"/>
+  </bean>
+
+  <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+    <!-- 线程池维护线程的最少数量 -->
+    <property name="corePoolSize" value="5"/>
+    <!-- 线程池维护线程所允许的空闲时间 -->
+    <property name="keepAliveSeconds" value="3000"/>
+    <!-- 线程池维护线程的最大数量 -->
+    <property name="maxPoolSize" value="200"/>
+    <!-- 线程池所使用的缓冲队列 -->
+    <property name="queueCapacity" value="200"/>
+  </bean>
+
+</beans>
